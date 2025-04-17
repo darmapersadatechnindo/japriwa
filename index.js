@@ -1,7 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const qrcode = require('qrcode-terminal');
-const Qrcode = require('qrcode');
+const qrcode = require('qrcode');
 const { createSession, getSession, getSessionStatus, loadAllSessions,sessions,sessionStatus } = require('./utils/session.js');
 
 const app = express();
@@ -18,9 +17,8 @@ app.post('/api/session', async (req, res) => {
     if (sessionStatus.connected) {
         return res.json({ message: 'Session already connected' });
     } else if (sessionStatus.qr) {
-        qrcode.generate(sessionStatus.qr, { small: true });
         try {
-            const qrCodeUrl = await Qrcode.toDataURL(sessionStatus.qr);
+            const qrCodeUrl = await qrcode.toDataURL(sessionStatus.qr);
             return res.json({ qrCodeUrl, message: 'Scan the QR code to connect' });
         } catch (error) {
             console.error('Error generating QR Code:', error);
