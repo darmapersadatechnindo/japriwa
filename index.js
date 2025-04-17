@@ -50,7 +50,7 @@ app.post('/api/send-message', async (req, res) => {
 });
 // Endpoint untuk menampilkan semua grup
 app.get('/api/groups', async (req, res) => {
-    const { sessionId } = req.query; // Ambil sessionId dari query parameter
+    const { sessionId } = req.query;
     const session = getSession(sessionId);
     if (!session) {
         return res.status(404).json({ message: 'Session not found' });
@@ -78,12 +78,18 @@ app.get('/api/group-members', async (req, res) => {
         if (!chat.isGroup) {
             return res.status(400).json({ message: 'The provided ID is not a group' });
         }
-
-        const members = chat.participants.map(participant => ({
-            id: participant.id._serialized,
-            isAdmin: participant.isAdmin,
-            isSuperAdmin: participant.isSuperAdmin,
-        }));
+        const members = await Promise.all(
+            chat.participants.map(async (participant) => {
+                const contact = await session.getContactById(participant.id._serialized);
+                return {
+                    id: participant.id._serialized,
+                    phone: participant.id.user,
+                    name: contact.isMyContact ? contact.name : contact.pushname || 'Unknown',
+                    isAdmin: participant.isAdmin,
+                    isSuperAdmin: participant.isSuperAdmin,
+                };
+            })
+        );
 
         res.json(members); // Kirim daftar anggota grup sebagai respons
     } catch (error) {
