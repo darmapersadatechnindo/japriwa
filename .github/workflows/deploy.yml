@@ -16,5 +16,4 @@ jobs:
           # Contoh script deploy sederhana:
           git pull origin main
           npm install
-          su japriwa
-          pm2 restart server-wa
+          su - japriwa -c "pm2 restart server-wa"
