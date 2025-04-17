@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const qrcode = require('qrcode');
+const cors = require('cors');
 const { createSession, getSession, getSessionStatus, loadAllSessions,sessions,sessionStatus } = require('./utils/session.js');
 
 const app = express();
