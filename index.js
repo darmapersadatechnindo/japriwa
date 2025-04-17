@@ -5,6 +5,8 @@ const { createSession, getSession, getSessionStatus, loadAllSessions,sessions,se
 
 const app = express();
 app.use(bodyParser.json());
+app.use(cors());
+
 loadAllSessions();
 // Endpoint untuk membuat sesi baru
 app.post('/api/session', async (req, res) => {
