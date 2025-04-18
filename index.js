@@ -67,7 +67,7 @@ app.get('/api/groups', async (req, res) => {
 });
 // Endpoint untuk menampilkan semua anggota grup
 app.get('/api/group-members', async (req, res) => {
-    const { sessionId, groupId } = req.query; // Ambil sessionId dan groupId dari query parameter
+    const { sessionId, groupId } = req.query;
     const session = getSession(sessionId);
     if (!session) {
         return res.status(404).json({ message: 'Session not found' });
@@ -106,6 +106,107 @@ app.get('/api/sessions', (req, res) => {
     }));
 
     res.json(allSessions); // Kirim daftar sesi sebagai respons
+});
+// Endpoint untuk mengirim pesan broadcast
+app.post('/api/broadcast', async (req, res) => {
+    const { sessionId, numbers, message } = req.body; // Ambil sessionId, daftar nomor, dan pesan dari body request
+    const session = getSession(sessionId);
+
+    if (!session) {
+        return res.status(404).json({ message: 'Session not found' });
+    }
+
+    if (!numbers || !Array.isArray(numbers) || numbers.length === 0) {
+        return res.status(400).json({ message: 'Numbers must be a non-empty array' });
+    }
+
+    if (numbers.length > 500) {
+        return res.status(400).json({ message: 'You can only send broadcast to a maximum of 500 numbers at a time' });
+    }
+
+    if (!message || message.trim() === '') {
+        return res.status(400).json({ message: 'Message is required' });
+    }
+
+    try {
+        const results = await Promise.all(
+            numbers.map(async (number) => {
+                try {
+                    await session.sendMessage(`${number}@c.us`, message);
+                    return { number, status: 'success' };
+                } catch (error) {
+                    console.error(`Failed to send message to ${number}:`, error);
+                    return { number, status: 'failed', error: error.message };
+                }
+            })
+        );
+
+        res.json({ message: 'Broadcast completed', results }); // Kirim hasil broadcast sebagai respons
+    } catch (error) {
+        console.error('Error during broadcast:', error);
+        res.status(500).json({ message: 'Failed to send broadcast' });
+    }
+});
+// Endpoint untuk mendapatkan semua kontak dari sesi
+app.get('/api/contacts', async (req, res) => {
+    const { sessionId } = req.query; // Ambil sessionId dari query parameter
+    const session = getSession(sessionId);
+
+    if (!session) {
+        return res.status(404).json({ message: 'Session not found' });
+    }
+
+    try {
+        const contacts = await session.getContacts(); // Ambil semua kontak dari sesi
+        const formattedContacts = contacts.map(contact => ({
+            id: contact.id._serialized,
+            phone: contact.id.user,
+            name: contact.isMyContact ? contact.name : contact.pushname || 'Unknown',
+            isBusiness: contact.isBusiness,
+            isEnterprise: contact.isEnterprise,
+        }));
+
+        res.json(formattedContacts); // Kirim daftar kontak sebagai respons
+    } catch (error) {
+        console.error('Error fetching contacts:', error);
+        res.status(500).json({ message: 'Failed to fetch contacts' });
+    }
+});
+// Endpoint untuk mengirim pesan dengan media
+app.post('/api/send-media', async (req, res) => {
+    const { sessionId, to, message, mediaUrl, fileName } = req.body; // Ambil data dari body request
+    const session = getSession(sessionId);
+
+    if (!session) {
+        return res.status(404).json({ message: 'Session not found' });
+    }
+
+    if (!to || !mediaUrl) {
+        return res.status(400).json({ message: 'Recipient and media URL are required' });
+    }
+
+    try {
+        // Unduh media dari URL
+        const axios = require('axios');
+        const mime = require('mime-types');
+        const response = await axios.get(mediaUrl, { responseType: 'arraybuffer' });
+        const mediaData = Buffer.from(response.data, 'binary');
+
+        // Tentukan tipe file berdasarkan URL atau fileName
+        const mimeType = mime.lookup(fileName || mediaUrl) || 'application/octet-stream';
+
+        // Buat media
+        const { MessageMedia } = require('whatsapp-web.js');
+        const media = new MessageMedia(mimeType, mediaData.toString('base64'), fileName || 'file');
+
+        // Kirim pesan dengan media
+        await session.sendMessage(`${to}@c.us`, media, { caption: message });
+
+        res.json({ message: 'Media message sent successfully' });
+    } catch (error) {
+        console.error('Error sending media message:', error);
+        res.status(500).json({ message: 'Failed to send media message' });
+    }
 });
 // Jalankan server
 const PORT = 3000;
