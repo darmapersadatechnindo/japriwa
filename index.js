@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const qrcode = require('qrcode');
 const cors = require('cors');
-const { createSession, getSession, getSessionStatus, loadAllSessions,sessions,sessionStatus } = require('./utils/session.js');
+const { createSession, getSession, getSessionStatus, loadAllSessions, sessions, sessionStatus } = require('./utils/session.js');
 
 const app = express();
 app.use(bodyParser.json());
@@ -148,6 +148,7 @@ app.post('/api/broadcast', async (req, res) => {
     }
 });
 // Endpoint untuk mendapatkan semua kontak dari sesi
+// Endpoint untuk mendapatkan semua kontak dari sesi
 app.get('/api/contacts', async (req, res) => {
     const { sessionId } = req.query; // Ambil sessionId dari query parameter
     const session = getSession(sessionId);
@@ -158,7 +159,11 @@ app.get('/api/contacts', async (req, res) => {
 
     try {
         const contacts = await session.getContacts(); // Ambil semua kontak dari sesi
-        const formattedContacts = contacts.map(contact => ({
+
+        // Filter hanya kontak dengan server "c.us"
+        const filteredContacts = contacts.filter(contact => contact.id.server === 'c.us');
+
+        const formattedContacts = filteredContacts.map(contact => ({
             id: contact.id._serialized,
             phone: contact.id.user,
             name: contact.isMyContact ? contact.name : contact.pushname || 'Unknown',
@@ -166,7 +171,7 @@ app.get('/api/contacts', async (req, res) => {
             isEnterprise: contact.isEnterprise,
         }));
 
-        res.json(formattedContacts); // Kirim daftar kontak sebagai respons
+        res.json(formattedContacts); // Kirim daftar kontak yang difilter sebagai respons
     } catch (error) {
         console.error('Error fetching contacts:', error);
         res.status(500).json({ message: 'Failed to fetch contacts' });
