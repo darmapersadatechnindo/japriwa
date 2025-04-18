@@ -149,6 +149,7 @@ app.post('/api/broadcast', async (req, res) => {
 });
 // Endpoint untuk mendapatkan semua kontak dari sesi
 // Endpoint untuk mendapatkan semua kontak dari sesi
+// Endpoint untuk mendapatkan semua kontak dari sesi
 app.get('/api/contacts', async (req, res) => {
     const { sessionId } = req.query; // Ambil sessionId dari query parameter
     const session = getSession(sessionId);
@@ -160,13 +161,13 @@ app.get('/api/contacts', async (req, res) => {
     try {
         const contacts = await session.getContacts(); // Ambil semua kontak dari sesi
 
-        // Filter hanya kontak dengan server "c.us"
-        const filteredContacts = contacts.filter(contact => contact.id.server === 'c.us');
+        // Filter kontak selain yang server "c.us" tetapi hanya jika isMyContact bernilai true
+        const filteredContacts = contacts.filter(contact => contact.id.server !== 'c.us' && contact.isMyContact);
 
         const formattedContacts = filteredContacts.map(contact => ({
             id: contact.id._serialized,
             phone: contact.id.user,
-            name: contact.isMyContact ? contact.name : contact.pushname || 'Unknown',
+            name: contact.name || contact.pushname || 'Unknown',
             isBusiness: contact.isBusiness,
             isEnterprise: contact.isEnterprise,
         }));
