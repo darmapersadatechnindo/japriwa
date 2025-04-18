@@ -32,6 +32,20 @@ app.post('/api/session', async (req, res) => {
     }
 });
 
+app.post('/api/status', async (req, res) => {
+    const { sessionId } = req.body;
+    const session = getSession(sessionId);
+    if (!session) {
+        return res.status(404).json({ message: 'Session not found' });
+    }
+    try {
+        const status = await session.getState();
+        res.json({ status });
+    } catch (error) {
+        
+    }
+});
+
 // Endpoint untuk mengirim pesan
 app.post('/api/send-message', async (req, res) => {
     const { sessionId, to, message } = req.body;
@@ -84,7 +98,7 @@ app.get('/api/group-members', async (req, res) => {
                 return {
                     id: participant.id._serialized,
                     phone: participant.id.user,
-                    name: contact.isMyContact ? contact.name : contact.pushname || 'Unknown',
+                    name: contact.isMyContact ? contact.name : contact.pushname || participant.id.user,
                     isAdmin: participant.isAdmin,
                     isSuperAdmin: participant.isSuperAdmin,
                 };
@@ -147,8 +161,6 @@ app.post('/api/broadcast', async (req, res) => {
         res.status(500).json({ message: 'Failed to send broadcast' });
     }
 });
-// Endpoint untuk mendapatkan semua kontak dari sesi
-// Endpoint untuk mendapatkan semua kontak dari sesi
 // Endpoint untuk mendapatkan semua kontak dari sesi
 app.get('/api/contacts', async (req, res) => {
     const { sessionId } = req.query; // Ambil sessionId dari query parameter
