@@ -162,7 +162,7 @@ app.get('/api/contacts', async (req, res) => {
         const contacts = await session.getContacts(); // Ambil semua kontak dari sesi
 
         // Filter kontak selain yang server "c.us" tetapi hanya jika isMyContact bernilai true
-        const filteredContacts = contacts.filter(contact => contact.id.server !== 'c.us' && contact.isMyContact);
+        const filteredContacts = contacts.filter(contact => contact.id.server === 'c.us' && contact.isMyContact);
 
         const formattedContacts = filteredContacts.map(contact => ({
             id: contact.id._serialized,
