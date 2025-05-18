@@ -1,0 +1,433 @@
+openapi: 3.0.0
+info:
+  title: Delta WhatsApp API
+  version: 1.0.0
+  description: Dokumentasi API untuk WhatsApp Multi-session Gateway
+
+servers:
+  - url: http://localhost:3000/api
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-apikey
+
+security:
+  - ApiKeyAuth: []
+
+paths:
+  /start/{sessionId}:
+    get:
+      summary: Mulai sesi WhatsApp
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Session berhasil dibuat
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  status:
+                    type: string
+
+  /qr/{sessionId}:
+    get:
+      summary: Ambil QR code dari session
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: QR code berhasil diambil
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  qrCodeUrl:
+                    type: string
+
+  /status/{sessionId}:
+    get:
+      summary: Cek status session
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Status session
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+
+  /group/{sessionId}:
+    get:
+      summary: Ambil list group dari session
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: List group berhasil diambil
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  groups:
+                    type: array
+                    items:
+                      type: object
+
+  /info/{sessionId}:
+    get:
+      summary: Ambil info akun WA dari session
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Info akun WA
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+
+  /contact/{sessionId}:
+    get:
+      summary: Ambil semua kontak user
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: List kontak berhasil diambil
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  rows:
+                    type: array
+                    items:
+                      type: object
+
+  /logout/{sessionId}:
+    get:
+      summary: Logout session
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Logout berhasil
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+
+  /chat/{sessionId}:
+    get:
+      summary: Ambil semua chat
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Daftar chat berhasil diambil
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  chats:
+                    type: array
+                    items:
+                      type: object
+
+  /send-message/{sessionId}:
+    post:
+      summary: Kirim pesan text
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - to
+                - message
+              properties:
+                to:
+                  type: string
+                message:
+                  type: string
+      responses:
+        200:
+          description: Pesan berhasil dikirim
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+
+  /send-media/{sessionId}:
+    post:
+      summary: Kirim media
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - to
+                - fileUrl
+              properties:
+                to:
+                  type: string
+                fileUrl:
+                  type: string
+                caption:
+                  type: string
+      responses:
+        200:
+          description: Media berhasil dikirim
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+
+  /events/{sessionId}:
+    get:
+      summary: Ambil event dari session
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Event berhasil diambil
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  events:
+                    type: array
+                    items:
+                      type: object
+
+  /number/{sessionId}/{contactId}:
+    get:
+      summary: Ambil data kontak berdasarkan ID
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: contactId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Data kontak berhasil diambil
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  contact:
+                    type: object
+
+  /profil-pic/{sessionId}/{contactId}:
+    get:
+      summary: Ambil foto profil dari kontak
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: contactId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Foto profil berhasil diambil
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  sessionId:
+                    type: string
+                  contactId:
+                    type: string
+                  profilePicUrl:
+                    type: string
+
+  /message/{sessionId}/{chatId}:
+    get:
+      summary: Ambil pesan dari chat tertentu
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: chatId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Daftar pesan berhasil diambil
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  messageData:
+                    type: array
+                    items:
+                      type: object
+
+  /download/{sessionId}/{messageId}:
+    get:
+      summary: Download media dari pesan
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: messageId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Media berhasil diunduh
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  messageId:
+                    type: string
+                  media:
+                    type: object
+
+  /device:
+    get:
+      summary: Ambil informasi device
+      responses:
+        200:
+          description: Device info
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  device:
+                    type: object

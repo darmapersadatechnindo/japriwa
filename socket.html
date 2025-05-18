@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Socket.IO WhatsApp API Docs</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 2rem;
+            background: #f4f4f4;
+        }
+
+        h1,
+        h2 {
+            color: #333;
+        }
+
+        pre {
+            background: #b9ffd7;
+            padding: 1rem;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+
+        code {
+            color: #2c3e50;
+        }
+
+        section {
+            background: #fff;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+    <h1>📡 WhatsApp Delta - Socket.IO API</h1>
+    <section>
+        <h2>Base URL</h2>
+        <pre><code>http://localhost:3000</code></pre>
+    </section>
+
+    <section>
+        <h2>Main Listener with WhatsApp Event (Client)</h2>
+        <pre><code>
+socket.on('waClient', ({ action, sessionId, success, message, data }) => {
+  console.log(`[${action}]`, success, message, data);
+});
+    </code></pre>
+    </section>
+
+    <section>
+        <h2>Available Events (Client &rarr; Server)</h2>
+
+        <h3>1. <code>start</code></h3>
+        <p>Start WhatsApp session</p>
+        <pre><code>
+socket.emit('start', { sessionId: 'your-session-id' });
+    </code></pre>
+
+        <h3>2. <code>status</code></h3>
+        <pre><code>
+socket.emit('status', { sessionId: 'your-session-id' });
+    </code></pre>
+
+        <h3>3. <code>group</code></h3>
+        <pre><code>
+socket.emit('group', { sessionId: 'your-session-id' });
+    </code></pre>
+
+        <h3>4. <code>getContactById</code></h3>
+        <pre><code>
+socket.emit('getContactById', {
+  sessionId: 'your-session-id',
+  contactId: 'contact@c.us'
+});
+    </code></pre>
+
+        <h3>5. <code>info</code></h3>
+        <pre><code>
+socket.emit('info', { sessionId: 'your-session-id' });
+    </code></pre>
+
+        <h3>6. <code>contact</code></h3>
+        <pre><code>
+socket.emit('contact', { sessionId: 'your-session-id' });
+    </code></pre>
+
+        <h3>7. <code>chatList</code></h3>
+        <pre><code>
+socket.emit('chatList', { sessionId: 'your-session-id' });
+    </code></pre>
+
+        <h3>8. <code>profilPic</code></h3>
+        <pre><code>
+socket.emit('profilPic', {
+  sessionId: 'your-session-id',
+  contactId: 'contact@c.us'
+});
+    </code></pre>
+
+        <h3>9. <code>logout</code></h3>
+        <pre><code>
+socket.emit('logout', { sessionId: 'your-session-id' });
+    </code></pre>
+
+        <h3>10. <code>sendMessage</code></h3>
+        <pre><code>
+socket.emit('sendMessage', {
+  sessionId: 'your-session-id',
+  to: '08xxxxxxxx',
+  message: 'Hello from Socket.IO'
+});
+    </code></pre>
+
+        <h3>11. <code>sendMedia</code></h3>
+        <pre><code>
+socket.emit('sendMedia', {
+  sessionId: 'your-session-id',
+  to: '08xxxxxxxx',
+  fileUrl: 'https://yourdomain.com/file.jpg',
+  caption: 'Check this out!'
+});
+    </code></pre>
+
+        <h3>12. <code>getEvents</code></h3>
+        <pre><code>
+socket.emit('getEvents', { sessionId: 'your-session-id' });
+    </code></pre>
+
+        <h3>13. <code>whatsapp:getQr</code></h3>
+        <pre><code>
+socket.emit('whatsapp:getQr', { sessionId: 'your-session-id' });
+    </code></pre>
+
+        <h3>14. <code>showMessage</code></h3>
+        <pre><code>
+socket.emit('showMessage', {
+  sessionId: 'your-session-id',
+  chatId: 'contact@c.us'
+});
+    </code></pre>
+
+        <h3>15. <code>downloadMedia</code></h3>
+        <pre><code>
+socket.emit('downloadMedia', {
+  sessionId: 'your-session-id',
+  messageId: 'message-id'
+});
+    </code></pre>
+
+    </section>
+</body>
+
+</html>
